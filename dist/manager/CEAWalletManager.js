@@ -8,9 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CEAWalletManager = void 0;
 const ethers_1 = require("ethers");
+const web3_1 = __importDefault(require("web3"));
+const ProviderBridge = require('ethers-provider-bridge');
 class CEAWalletManager {
     constructor(_keyService, _keyStorage) {
         this._keyService = _keyService;
@@ -47,6 +52,18 @@ class CEAWalletManager {
             return ks;
         });
     }
+    createBlockchainWallet(url, id, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ks = yield this._keyStorage.find(id);
+            yield this._keyStorage.enableCrypto(password);
+            const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
+            const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+            wallet.connect(infuraPovider);
+            ProviderBridge(infuraPovider, infuraPovider.getSigner());
+            const web3 = new web3_1.default(new ProviderBridge(infuraPovider, infuraPovider.getSigner()));
+            return web3;
+        });
+    }
     generateMnemonic() {
         return ethers_1.ethers.Wallet.createRandom().mnemonic;
     }
@@ -61,10 +78,13 @@ class CEAWalletManager {
             }
         });
     }
-    getWalletAddress(mnemonic) {
-        const wallet = ethers_1.ethers.Wallet.fromMnemonic(mnemonic);
-        const { address } = wallet;
-        return address;
+    getWalletAddress(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ks = yield this._keyStorage.find(id);
+            const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+            const { address } = wallet;
+            return address;
+        });
     }
 }
 exports.CEAWalletManager = CEAWalletManager;

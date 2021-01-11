@@ -11,5 +11,5 @@ export interface WalletManager {
 	createBlockchainWallet(url: string, id: string, password: string):Promise<Web3>;
 	generateMnemonic(): string;
 	unlockWallet(id: string, passphrase: string): Promise<KeyStorageModel>;
-	getWalletAddress(mnemonic: string): Promise<string>;
+	getWalletAddress(id: string): Promise<string>;
 }
