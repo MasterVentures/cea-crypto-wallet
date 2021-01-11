@@ -46,6 +46,7 @@
 		"ed25519-hd-key": "^1.1.2",
 		"elliptic": "^6.5.3",
 		"ethers": "^4.0.48",
+		"ethers-web3-bridge": "^0.0.1",
 		"ethr-did-resolver": "^2.2.0",
 		"hash.js": "^1.1.7",
 		"hdkey-secp256r1": "^1.1.0",
