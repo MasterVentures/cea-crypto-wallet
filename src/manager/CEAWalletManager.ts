@@ -4,7 +4,7 @@ import { KeyService } from '../crypto';
 import { KeyStorage } from '../key-storage';
 import { KeyStorageModel } from '../key-storage/KeyStorageModel';
 import  Web3 from 'web3';
-const ProviderBridge = require('ethers-provider-bridge');
+const ProviderBridge = require('ethers-web3-bridge');
 
 export class CEAWalletManager implements WalletManager {
 	//URL = 'https://rinkeby.infura.io/v3/6d8bfebd6db24c3cb3f3d50839e1c5be';
