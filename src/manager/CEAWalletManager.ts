@@ -69,7 +69,8 @@ export class CEAWalletManager implements WalletManager {
 		
 		const result: WalletModel = {
 			web3Instance: web3,
-			wallet
+			wallet,
+			provider: await provider.getNetwork()
 		}
 		return result;
 	}

@@ -62,7 +62,8 @@ class CEAWalletManager {
             const web3 = new web3_1.default(new ProviderBridge(provider, provider.getSigner()));
             const result = {
                 web3Instance: web3,
-                wallet
+                wallet,
+                provider: yield provider.getNetwork()
             };
             return result;
         });
