@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CEAWalletManager = void 0;
 const ethers_1 = require("ethers");
 const web3_1 = __importDefault(require("web3"));
-const ProviderBridge = require('ethers-provider-bridge');
+const ProviderBridge = require('ethers-web3-bridge');
 class CEAWalletManager {
     constructor(_keyService, _keyStorage) {
         this._keyService = _keyService;
