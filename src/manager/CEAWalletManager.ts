@@ -53,22 +53,26 @@ export class CEAWalletManager implements WalletManager {
 		return ks;
 	}
 
-	async createBlockchainWallet(url: string, id: string, password: string){
+	async createBlockchainWallet(url: string, options: any, id: string, password: string){
 
 		const ks = await this._keyStorage.find<KeyStorageModel>(id);
 
 		await this._keyStorage.enableCrypto(password);
 
 		// Connect to a standard Ethers Provider
+		const _web3 = new Web3 ( new Web3.providers.WebsocketProvider(url, options));
 		const provider = new ethers.providers.JsonRpcProvider(url);
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
 
 		wallet.connect(provider)
 
-		const web3 = new Web3(new ProviderBridge(provider, provider.getSigner()));
-		
+		const mnemonicWallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
+		const { privateKey } = mnemonicWallet;
+
+		//const web3 = new Web3(new ProviderBridge(provider, provider.getSigner()));
+		_web3.eth.accounts.wallet.clear().add(privateKey);
 		const result: WalletModel = {
-			web3Instance: web3,
+			web3Instance: _web3,
 			wallet,
 			provider: await provider.getNetwork()
 		}
