@@ -80,10 +80,15 @@ class CEAWalletManager {
     }
     getWalletAddress(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ks = yield this._keyStorage.find(id);
-            const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
-            const { address } = wallet;
-            return address;
+            try {
+                const ks = yield this._keyStorage.find(id);
+                const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+                const { address } = wallet;
+                return address;
+            }
+            catch (ex) {
+                console.log(ex);
+            }
         });
     }
 }
