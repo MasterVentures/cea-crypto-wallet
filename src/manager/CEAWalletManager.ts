@@ -55,15 +55,14 @@ export class CEAWalletManager implements WalletManager {
 	async createBlockchainWallet(url: string, id: string, password: string){
 
 		const ks = await this._keyStorage.find<KeyStorageModel>(id);
-
+		
 		await this._keyStorage.enableCrypto(password);
 
 		// Connect to a standard Ethers Provider
 		const infuraPovider = new ethers.providers.InfuraProvider(url);
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
 
-		wallet.connect(infuraPovider)
-		ProviderBridge(infuraPovider, (<ethers.providers.JsonRpcProvider>infuraPovider).getSigner())
+		wallet.connect(infuraPovider);
 
 		const web3 = new Web3(new ProviderBridge(infuraPovider, (<ethers.providers.JsonRpcProvider>infuraPovider).getSigner()));
 		
