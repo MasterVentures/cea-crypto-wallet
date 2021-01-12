@@ -8,7 +8,7 @@ export interface WalletManager {
 	getKeyService(): KeyService;
 	getKeyStorage(): KeyStorage;
 	createWallet(password: string, mnemonic: string): Promise<KeyStorageModel>;
-	createBlockchainWallet(url: string, id: string, password: string):Promise<WalletModel>;
+	createBlockchainWallet(url: string, options: any, id: string, password: string):Promise<WalletModel>;
 	generateMnemonic(): string;
 	unlockWallet(id: string, passphrase: string): Promise<KeyStorageModel>;
 	getWalletAddress(id: string): Promise<string>;
