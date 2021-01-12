@@ -59,7 +59,6 @@ class CEAWalletManager {
             const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
             wallet.connect(infuraPovider);
-            ProviderBridge(infuraPovider, infuraPovider.getSigner());
             const web3 = new web3_1.default(new ProviderBridge(infuraPovider, infuraPovider.getSigner()));
             return web3;
         });
