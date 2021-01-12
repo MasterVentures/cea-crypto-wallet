@@ -54,13 +54,18 @@ class CEAWalletManager {
     }
     createBlockchainWallet(url, id, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ks = yield this._keyStorage.find(id);
-            yield this._keyStorage.enableCrypto(password);
-            const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
-            const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
-            wallet.connect(infuraPovider);
-            const web3 = new web3_1.default(new ProviderBridge(infuraPovider, infuraPovider.getSigner()));
-            return web3;
+            try {
+                const ks = yield this._keyStorage.find(id);
+                yield this._keyStorage.enableCrypto(password);
+                const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
+                const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+                wallet.connect(infuraPovider);
+                const web3 = new web3_1.default(new ProviderBridge(infuraPovider, infuraPovider.getSigner()));
+                return web3;
+            }
+            catch (e) {
+                console.log(e);
+            }
         });
     }
     generateMnemonic() {
