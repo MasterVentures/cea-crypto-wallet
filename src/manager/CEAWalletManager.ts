@@ -60,8 +60,8 @@ export class CEAWalletManager implements WalletManager {
 			await this._keyStorage.enableCrypto(password);
 
 			// Connect to a standard Ethers Provider
-			const infuraPovider = new ethers.providers.InfuraProvider(url);
 			const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
+			const infuraPovider = new ethers.providers.InfuraProvider(url);
 
 			wallet.connect(infuraPovider);
 

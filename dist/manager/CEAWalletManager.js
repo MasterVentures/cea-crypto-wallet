@@ -57,8 +57,8 @@ class CEAWalletManager {
             try {
                 const ks = yield this._keyStorage.find(id);
                 yield this._keyStorage.enableCrypto(password);
-                const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
                 const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+                const infuraPovider = new ethers_1.ethers.providers.InfuraProvider(url);
                 wallet.connect(infuraPovider);
                 const web3 = new web3_1.default(new ProviderBridge(infuraPovider, infuraPovider.getSigner()));
                 return web3;
