@@ -3,6 +3,7 @@ import { ethers, providers } from 'ethers';
 import { KeyService } from '../crypto';
 import { KeyStorage } from '../key-storage';
 import { KeyStorageModel } from '../key-storage/KeyStorageModel';
+import { WalletModel } from '../key-storage/WalletModel';
 import  Web3 from 'web3';
 const ProviderBridge = require('ethers-web3-bridge');
 
@@ -59,15 +60,18 @@ export class CEAWalletManager implements WalletManager {
 		await this._keyStorage.enableCrypto(password);
 
 		// Connect to a standard Ethers Provider
-		const infuraPovider = new ethers.providers.InfuraProvider(url);
+		const provider = new ethers.providers.JsonRpcProvider(url);
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
 
-		wallet.connect(infuraPovider)
-		ProviderBridge(infuraPovider, (<ethers.providers.JsonRpcProvider>infuraPovider).getSigner())
+		wallet.connect(provider)
 
-		const web3 = new Web3(new ProviderBridge(infuraPovider, (<ethers.providers.JsonRpcProvider>infuraPovider).getSigner()));
+		const web3 = new Web3(new ProviderBridge(provider, provider.getSigner()));
 		
-		return web3;
+		const result: WalletModel = {
+			web3Instance: web3,
+			wallet
+		}
+		return result;
 	}
 
 	generateMnemonic(): string {
