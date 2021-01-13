@@ -52,11 +52,11 @@ class CEAWalletManager {
             return ks;
         });
     }
-    createBlockchainWallet(url, options, id, password) {
+    createBlockchainWallet(url, wsurl, options, id, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const ks = yield this._keyStorage.find(id);
             yield this._keyStorage.enableCrypto(password);
-            const _web3 = new web3_1.default(new web3_1.default.providers.WebsocketProvider(url, options));
+            const _web3 = new web3_1.default(new web3_1.default.providers.WebsocketProvider(wsurl, options));
             const provider = new ethers_1.ethers.providers.JsonRpcProvider(url);
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
             wallet.connect(provider);
