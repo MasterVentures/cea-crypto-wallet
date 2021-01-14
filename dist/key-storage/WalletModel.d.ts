@@ -3,5 +3,6 @@ import { ethers } from 'ethers';
 export interface WalletModel {
     web3Instance: Web3;
     wallet: ethers.Wallet;
+    _wallet: any;
     provider: ethers.utils.Network;
 }

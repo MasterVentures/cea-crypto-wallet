@@ -56,9 +56,11 @@ class CEAWalletManager {
         return __awaiter(this, void 0, void 0, function* () {
             const ks = yield this._keyStorage.find(id);
             yield this._keyStorage.enableCrypto(password);
-            const _web3 = new web3_1.default(new web3_1.default.providers.WebsocketProvider(wsurl, options));
+            const _provider = new web3_1.default.providers.WebsocketProvider(wsurl, options);
+            const _web3 = new web3_1.default(_provider);
             const provider = new ethers_1.ethers.providers.JsonRpcProvider(url);
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+            const _wallet = _web3.eth.accounts.wallet.add(wallet.privateKey);
             wallet.connect(provider);
             const mnemonicWallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
             const { privateKey } = mnemonicWallet;
@@ -66,6 +68,7 @@ class CEAWalletManager {
             const result = {
                 web3Instance: _web3,
                 wallet,
+                _wallet,
                 provider: yield provider.getNetwork()
             };
             return result;

@@ -60,10 +60,12 @@ export class CEAWalletManager implements WalletManager {
 		await this._keyStorage.enableCrypto(password);
 
 		// Connect to a standard Ethers Provider
-		const _web3 = new Web3 ( new Web3.providers.WebsocketProvider(wsurl, options));
+		const _provider = new Web3.providers.WebsocketProvider(wsurl, options);
+		const _web3 = new Web3 (_provider);
 		const provider = new ethers.providers.JsonRpcProvider(url);
+		
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
-
+		const _wallet =_web3.eth.accounts.wallet.add(wallet.privateKey);
 		wallet.connect(provider)
 
 		const mnemonicWallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
@@ -74,6 +76,7 @@ export class CEAWalletManager implements WalletManager {
 		const result: WalletModel = {
 			web3Instance: _web3,
 			wallet,
+			_wallet,
 			provider: await provider.getNetwork()
 		}
 		return result;
