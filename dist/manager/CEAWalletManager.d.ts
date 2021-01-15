@@ -13,5 +13,5 @@ export declare class CEAWalletManager implements WalletManager {
     createBlockchainWallet(wsurl: string, options: any, id: string, password: string): Promise<WalletModel>;
     generateMnemonic(): string;
     unlockWallet(id: string, passphrase: string): Promise<KeyStorageModel>;
-    getWalletAddress(id: string): Promise<string>;
+    getWalletAddress(id: string, password: string): Promise<string>;
 }
