@@ -1,6 +1,6 @@
 {
 	"name": "universal-crypto-wallet",
-	"version": "1.2.0",
+	"version": "1.2.4",
 	"description": "Universal Crypto Wallet",
 	"main": "dist/index.js",
 	"scripts": {
