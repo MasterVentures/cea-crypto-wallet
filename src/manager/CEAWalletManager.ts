@@ -63,7 +63,7 @@ export class CEAWalletManager implements WalletManager {
 		const _provider = new Web3.providers.WebsocketProvider(wsurl, options);
 		const _web3 = new Web3 (_provider);
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
-		const walletInstance =_web3.eth.accounts.wallet.add(wallet.privateKey);
+		const walletInstance =_web3.eth.accounts.wallet.clear().add(wallet.privateKey);
 		_web3.defaultAccount = walletInstance.address;
 		const result: WalletModel = {
 			web3Instance: _web3,
