@@ -87,10 +87,13 @@ class CEAWalletManager {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const ks = yield this._keyStorage.find(id);
-                yield this._keyStorage.enableCrypto(password);
-                const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
-                const { address } = wallet;
-                return address;
+                if (ks.mnemonic) {
+                    yield this._keyStorage.enableCrypto(password);
+                    const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+                    const { address } = wallet;
+                    return address;
+                }
+                return '';
             }
             catch (ex) {
                 console.log(ex);
