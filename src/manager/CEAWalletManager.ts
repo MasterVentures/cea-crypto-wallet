@@ -89,10 +89,13 @@ export class CEAWalletManager implements WalletManager {
 	async getWalletAddress(id: string, password: string): Promise<string> {
 		try{
 			const ks = await this._keyStorage.find<KeyStorageModel>(id);
-			await this._keyStorage.enableCrypto(password);
-			const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
-			const { address } = wallet;
-			return address;
+			if(ks.mnemonic){
+				await this._keyStorage.enableCrypto(password);
+				const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
+				const { address } = wallet;
+				return address;
+			}
+			return '';
 		}
 		catch(ex){
 			console.log(ex);
