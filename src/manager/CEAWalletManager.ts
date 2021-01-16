@@ -55,8 +55,9 @@ export class CEAWalletManager implements WalletManager {
 
 	async createBlockchainWallet(wsurl: string, options: any, id: string, password: string){
 
-		await this._keyStorage.enableCrypto(password);
 		const ks = await this._keyStorage.find<KeyStorageModel>(id);
+
+		await this._keyStorage.enableCrypto(password);
 
 		// Connect to a standard Ethers Provider
 		const _provider = new Web3.providers.WebsocketProvider(wsurl, options);
@@ -87,8 +88,8 @@ export class CEAWalletManager implements WalletManager {
 
 	async getWalletAddress(id: string, password: string): Promise<string> {
 		try{
-			await this._keyStorage.enableCrypto(password);
 			const ks = await this._keyStorage.find<KeyStorageModel>(id);
+			await this._keyStorage.enableCrypto(password);
 			const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
 			const { address } = wallet;
 			return address;
