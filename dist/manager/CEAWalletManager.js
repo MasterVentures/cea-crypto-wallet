@@ -54,8 +54,8 @@ class CEAWalletManager {
     }
     createBlockchainWallet(wsurl, options, id, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ks = yield this._keyStorage.find(id);
             yield this._keyStorage.enableCrypto(password);
+            const ks = yield this._keyStorage.find(id);
             const _provider = new web3_1.default.providers.WebsocketProvider(wsurl, options);
             const _web3 = new web3_1.default(_provider);
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
@@ -86,9 +86,9 @@ class CEAWalletManager {
     getWalletAddress(id, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                yield this._keyStorage.enableCrypto(password);
                 const ks = yield this._keyStorage.find(id);
                 if (ks.mnemonic) {
-                    yield this._keyStorage.enableCrypto(password);
                     const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
                     const { address } = wallet;
                     return address;
