@@ -1,4 +1,4 @@
-import { CEAFDSWalletManager } from './CEAFDSWalletManager';
+import { ethers } from 'ethers';
 import { KeyService } from '../crypto';
 import { KeyStorage } from '../key-storage';
 export declare class CEAFDSAccounts {
@@ -9,6 +9,6 @@ export declare class CEAFDSAccounts {
     _keyStorage: KeyStorage;
     constructor(client: any, keyService: KeyService, keyStorage: KeyStorage);
     createWallet(username: string, password: string): Promise<{
-        paid: CEAFDSWalletManager;
+        paid: ethers.Wallet;
     }>;
 }

@@ -35,8 +35,8 @@ class CEAFDSAccounts {
             const address = ethersWallet.address;
             const options = { customId: address, mnemonic: mnemonic };
             const user = yield this.client.RestoreAccountFromPrivateKey(username, password, privateKey);
-            const wallet = yield fdsWallet.createFDSWallet(password, options);
-            wallet.setUser(user);
+            const wallet = yield fdsWallet.createWallet2(password, options.mnemonic);
+            fdsWallet.setUser(user);
             return { paid: wallet };
         });
     }

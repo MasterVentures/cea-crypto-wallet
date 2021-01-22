@@ -33,8 +33,8 @@ export class CEAFDSAccounts {
 
         const user = await this.client.RestoreAccountFromPrivateKey(username, password, privateKey);
 
-        const wallet = await fdsWallet.createFDSWallet(password, options);
-        wallet.setUser(user);
+        const wallet = await fdsWallet.createWallet2(password, options.mnemonic);
+        fdsWallet.setUser(user);
         return { paid: wallet }; 
     }
 }
