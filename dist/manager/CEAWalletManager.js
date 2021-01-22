@@ -27,6 +27,9 @@ class CEAWalletManager {
     getKeyStorage() {
         return this._keyStorage;
     }
+    static generateMnemonic() {
+        return ethers_1.ethers.Wallet.createRandom().mnemonic;
+    }
     createWallet(password, mnemonic) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!ethers_1.ethers.utils.HDNode.isValidMnemonic(mnemonic)) {
@@ -52,6 +55,35 @@ class CEAWalletManager {
             return ks;
         });
     }
+    createFDSWallet(password, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let _id = Buffer.from(ethers_1.ethers.utils.randomBytes(100)).toString('base64');
+            if (options.id) {
+                _id = options.id;
+            }
+            const mnemonic = options.mnemonic;
+            if (!ethers_1.ethers.utils.HDNode.isValidMnemonic(mnemonic)) {
+                throw new Error('The Mnemonic is not valid.');
+            }
+            const wallet = ethers_1.ethers.Wallet.fromMnemonic(mnemonic);
+            const keystoreSeed = yield wallet.encrypt(password);
+            const { stores, exports } = yield this._keyService.generateKeys(mnemonic);
+            const ks = {
+                _id,
+                keypairs: stores,
+                keystoreSeed,
+                mnemonic,
+                keypairExports: exports,
+                created: new Date()
+            };
+            yield this._keyStorage.enableCrypto(password);
+            const result = yield this._keyStorage.save(ks);
+            if (!result.ok) {
+                throw new Error('Wallet not saved to storage.');
+            }
+            return this;
+        });
+    }
     createBlockchainWallet(wsurl, options, id, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const ks = yield this._keyStorage.find(id);
@@ -60,6 +92,7 @@ class CEAWalletManager {
             const _web3 = new web3_1.default(_provider);
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
             const walletInstance = _web3.eth.accounts.wallet.add(wallet.privateKey);
+            _web3.defaultAccount = walletInstance.address;
             const result = {
                 web3Instance: _web3,
                 walletInstance,
