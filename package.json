@@ -25,6 +25,7 @@
 		"@types/rasha": "^1.2.1",
 		"@types/xml-crypto": "^1.4.1",
 		"chai": "^4.2.0",
+		"fds.js": "^0.1.30",
 		"mocha": "^7.1.2",
 		"ts-mocha": "^7.0.0",
 		"ts-node-dev": "^1.0.0-pre.44",

@@ -6,21 +6,29 @@ import { KeyStorageModel } from '../key-storage/KeyStorageModel';
 import { WalletModel } from '../key-storage/WalletModel';
 import  Web3 from 'web3';
 const ProviderBridge = require('ethers-web3-bridge');
+import { CEAFDSWalletManager } from './CEAFDSWalletManager';
 
 export class CEAWalletManager implements WalletManager {
 	//URL = 'https://rinkeby.infura.io/v3/6d8bfebd6db24c3cb3f3d50839e1c5be';
 	constructor(
-		private _keyService: KeyService,
-		private _keyStorage: KeyStorage
+		public _keyService: KeyService,
+		public _keyStorage: KeyStorage
 	) {}
 
 	public getKeyService() {
 		return this._keyService;
-	}
+	}	
 
 	public getKeyStorage() {
 		return this._keyStorage;
 	}
+
+    /**
+    * Generates a mnemonic
+    */
+    public static generateMnemonic() {
+        return ethers.Wallet.createRandom().mnemonic;
+    }
 
 	async createWallet(
 		password: string,
@@ -53,6 +61,42 @@ export class CEAWalletManager implements WalletManager {
 		return ks;
 	}
 
+	async createFDSWallet(
+		password: string,
+		options: any
+	){
+		let _id = Buffer.from(ethers.utils.randomBytes(100)).toString('base64');	
+		if(options.id){
+			_id = options.id;
+		}
+		const mnemonic = options.mnemonic;
+
+		if (!ethers.utils.HDNode.isValidMnemonic(mnemonic)) {
+			throw new Error('The Mnemonic is not valid.');
+		}
+
+		const wallet = ethers.Wallet.fromMnemonic(mnemonic);
+
+		const keystoreSeed = await wallet.encrypt(password);
+		const { stores, exports } = await this._keyService.generateKeys(mnemonic);
+
+		const ks: KeyStorageModel = {
+			_id,
+			keypairs: stores,
+			keystoreSeed,
+			mnemonic,
+			keypairExports: exports,
+			created: new Date()
+		};
+
+		await this._keyStorage.enableCrypto(password);
+		const result = await this._keyStorage.save(ks);
+		if (!result.ok) {
+			throw new Error('Wallet not saved to storage.');
+		}
+		return this;
+	}
+
 	async createBlockchainWallet(wsurl: string, options: any, id: string, password: string){
 
 		const ks = await this._keyStorage.find<KeyStorageModel>(id);
@@ -65,6 +109,7 @@ export class CEAWalletManager implements WalletManager {
 		
 		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
 		const walletInstance =_web3.eth.accounts.wallet.add(wallet.privateKey);
+		_web3.defaultAccount = walletInstance.address;
 		const result: WalletModel = {
 			web3Instance: _web3,
 			walletInstance,
