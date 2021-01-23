@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CEAFDSAccounts = void 0;
 const ethers_1 = require("ethers");
 const CEAFDSWalletManager_1 = require("./CEAFDSWalletManager");
 let FDS = require('FDS.js');

@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AlgorithmType = void 0;
 var AlgorithmType;
 (function (AlgorithmType) {
     AlgorithmType[AlgorithmType["RSA"] = 0] = "RSA";

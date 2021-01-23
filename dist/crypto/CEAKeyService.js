@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CEAKeyService = void 0;
 const elliptic_1 = require("elliptic");
 const ed25519_hd_key_1 = require("ed25519-hd-key");
 const ethers_1 = require("ethers");
