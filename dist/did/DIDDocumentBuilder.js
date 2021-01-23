@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DIDDocumentBuilder = void 0;
 const DIDDocument_1 = require("./DIDDocument");
 class DIDDocumentBuilder {
     static createDID({ issuer, verificationKeys, authenticationKeys, services = [] }) {

@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CEAWalletManager = void 0;
 const ethers_1 = require("ethers");
 const web3_1 = __importDefault(require("web3"));
 const ProviderBridge = require('ethers-web3-bridge');
+const CEAFDSAccount_1 = require("./CEAFDSAccount");
 class CEAWalletManager {
     constructor(_keyService, _keyStorage) {
         this._keyService = _keyService;
@@ -55,19 +55,15 @@ class CEAWalletManager {
             return ks;
         });
     }
-    createFDSWallet(password, options) {
+    createWallet2(password, mnemonic) {
         return __awaiter(this, void 0, void 0, function* () {
-            let _id = Buffer.from(ethers_1.ethers.utils.randomBytes(100)).toString('base64');
-            if (options.id) {
-                _id = options.id;
-            }
-            const mnemonic = options.mnemonic;
             if (!ethers_1.ethers.utils.HDNode.isValidMnemonic(mnemonic)) {
                 throw new Error('The Mnemonic is not valid.');
             }
             const wallet = ethers_1.ethers.Wallet.fromMnemonic(mnemonic);
             const keystoreSeed = yield wallet.encrypt(password);
             const { stores, exports } = yield this._keyService.generateKeys(mnemonic);
+            const _id = Buffer.from(ethers_1.ethers.utils.randomBytes(100)).toString('base64');
             const ks = {
                 _id,
                 keypairs: stores,
@@ -81,7 +77,21 @@ class CEAWalletManager {
             if (!result.ok) {
                 throw new Error('Wallet not saved to storage.');
             }
-            return this;
+            return wallet;
+        });
+    }
+    createFDSWallet(password, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let _id = Buffer.from(ethers_1.ethers.utils.randomBytes(100)).toString('base64');
+            if (id) {
+                _id = id;
+            }
+            const ks = yield this._keyStorage.find(_id);
+            const mnemonic = ks.mnemonic;
+            const account = new CEAFDSAccount_1.CEAFDSAccounts(null, this.getKeyService(), this.getKeyStorage());
+            const wallet = ethers_1.ethers.Wallet.fromMnemonic(mnemonic);
+            const sWallet = yield account.createWallet(wallet.address, password);
+            return sWallet;
         });
     }
     createBlockchainWallet(wsurl, options, id, password) {

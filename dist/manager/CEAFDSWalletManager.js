@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CEAFDSWalletManager = void 0;
 const CEAWalletManager_1 = require("./CEAWalletManager");
 class CEAFDSWalletManager extends CEAWalletManager_1.CEAWalletManager {
     constructor(fds, keyService, keyStorage) {
