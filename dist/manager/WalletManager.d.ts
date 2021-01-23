@@ -7,7 +7,7 @@ export interface WalletManager {
     getKeyStorage(): KeyStorage;
     createWallet(password: string, mnemonic: string): Promise<KeyStorageModel>;
     createWallet2(password: string, mnemonic: string): any;
-    createFDSWallet(passwor: string, options: any): any;
+    createFDSWallet(password: string, id: string): any;
     createBlockchainWallet(wsurl: string, options: any, id: string, password: string): Promise<WalletModel>;
     generateMnemonic(): string;
     unlockWallet(id: string, passphrase: string): Promise<KeyStorageModel>;

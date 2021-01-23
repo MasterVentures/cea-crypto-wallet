@@ -103,11 +103,9 @@ export class CEAWalletManager implements WalletManager {
 		}
 		const ks = await this._keyStorage.find<KeyStorageModel>(_id);
 		const mnemonic = ks.mnemonic;
-
-		const options = { customId : _id, mnemonic : mnemonic };
 		
 		const account = new CEAFDSAccounts(null, this.getKeyService(), this.getKeyStorage());
-		const wallet = ethers.Wallet.fromMnemonic(ks.mnemonic);
+		const wallet = ethers.Wallet.fromMnemonic(mnemonic);
 		const sWallet = await account.createWallet(wallet.address, password);
 
 		return sWallet;

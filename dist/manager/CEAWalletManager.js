@@ -89,9 +89,8 @@ class CEAWalletManager {
             }
             const ks = yield this._keyStorage.find(_id);
             const mnemonic = ks.mnemonic;
-            const options = { customId: _id, mnemonic: mnemonic };
             const account = new CEAFDSAccount_1.CEAFDSAccounts(null, this.getKeyService(), this.getKeyStorage());
-            const wallet = ethers_1.ethers.Wallet.fromMnemonic(ks.mnemonic);
+            const wallet = ethers_1.ethers.Wallet.fromMnemonic(mnemonic);
             const sWallet = yield account.createWallet(wallet.address, password);
             return sWallet;
         });
