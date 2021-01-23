@@ -17,7 +17,7 @@ export class CEAFDSAccounts {
             swarmGateway: 'https://swarm.fairdatasociety.org',
             ethGateway: 'https://geth-noordung.fairdatasociety.org',
             chainID: '3'
-        }); 
+        });
         this._keyService = keyService;
         this._keyStorage = keyStorage;
     }
