@@ -118,6 +118,23 @@ export class CEAWalletManager implements WalletManager {
 		return result;
 	}
 
+	async createMetamaskWallet(ethereum: any /*, wsurl: string, options: any, id: string, password: string*/){
+
+		// const ks = await this._keyStorage.find<KeyStorageModel>(id);
+
+		// await this._keyStorage.enableCrypto(password);
+
+		const _web3 = new Web3 (ethereum);
+		const walletInstance = _web3.eth.accounts.wallet;
+
+		const result: WalletModel = {
+			web3Instance: _web3,
+			walletInstance,
+			network: await _web3.eth.getChainId()
+		}
+		return result;
+	}
+
 	generateMnemonic(): string {
 		return ethers.Wallet.createRandom().mnemonic;
 	}
