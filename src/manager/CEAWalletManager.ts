@@ -62,7 +62,7 @@ export class CEAWalletManager implements WalletManager {
 		return ks;
 	}
 
-	async createWallet2(
+	/*async createWallet2(
 		password: string,
 		mnemonic: string
 	){
@@ -109,7 +109,7 @@ export class CEAWalletManager implements WalletManager {
 		const sWallet = await account.createWallet(wallet.address, password);
 
 		return sWallet;
-	}
+	}*/
 
 	async createBlockchainWallet(wsurl: string, options: any, id: string, password: string){
 		const ks = await this._keyStorage.find<KeyStorageModel>(id);
