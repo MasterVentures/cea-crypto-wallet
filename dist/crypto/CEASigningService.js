@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CEASigningService = void 0;
 const elliptic_1 = require("elliptic");
 const AlgorithmType_1 = require("./AlgorithmType");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyConverter = exports.X509Info = void 0;
 const node_jose_1 = require("node-jose");
 const bs58_1 = __importDefault(require("bs58"));
 const crypto_key_composer_1 = require("crypto-key-composer");

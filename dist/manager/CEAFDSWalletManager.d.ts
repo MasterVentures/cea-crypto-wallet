@@ -1,12 +1,7 @@
-import { CEAWalletManager } from './CEAWalletManager';
-import { KeyService } from '../crypto';
-import { KeyStorage } from '../key-storage';
-export declare class CEAFDSWalletManager extends CEAWalletManager {
+export declare class CEAFDSWalletManager {
     fds: any;
-    keyService: KeyService;
-    keyStorage: KeyStorage;
     fdsUser: any;
-    constructor(fds: any, keyService: KeyService, keyStorage: KeyStorage);
+    constructor(fds: any);
     setUser(user: any): void;
     getUser(): any;
 }

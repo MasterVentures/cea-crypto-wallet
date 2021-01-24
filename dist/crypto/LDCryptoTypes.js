@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LDCryptoTypes = void 0;
 var LDCryptoTypes;
 (function (LDCryptoTypes) {
     LDCryptoTypes[LDCryptoTypes["Ed25519"] = 0] = "Ed25519";

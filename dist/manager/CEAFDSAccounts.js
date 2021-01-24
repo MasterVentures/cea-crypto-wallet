@@ -8,24 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CEAFDSAccounts = void 0;
 const ethers_1 = require("ethers");
 const CEAFDSWalletManager_1 = require("./CEAFDSWalletManager");
-const fds_js_1 = __importDefault(require("fds.js"));
 class CEAFDSAccounts {
     constructor(client, keyService, keyStorage) {
         this.client = client;
         this.keyService = keyService;
         this.keyStorage = keyStorage;
-        this.client = new fds_js_1.default({
-            swarmGateway: 'https://swarm.fairdatasociety.org',
-            ethGateway: 'https://geth-noordung.fairdatasociety.org',
-            chainID: '3'
-        });
     }
     getKeyService() {
         return this.keyService;

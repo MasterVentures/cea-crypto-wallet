@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ParsedDID = exports.Params = exports.DIDDocument = void 0;
 class DIDDocument {
     constructor() {
         this.created = new Date();
