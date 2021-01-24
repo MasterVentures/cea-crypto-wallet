@@ -5,5 +5,4 @@ export interface FDSWalletManager {
     getKeyStorage(): KeyStorage;
     createWallet(username: string, password: string): any;
     generateMnemonic(): string;
-    createWallet2(password: string, mnemonic: string): any;
 }

@@ -13,5 +13,5 @@ export declare class CEAFDSAccounts implements FDSWalletManager {
     createWallet(username: string, password: string): Promise<{
         paid: ethers.Wallet;
     }>;
-    createWallet2(password: string, mnemonic: string): Promise<ethers.Wallet>;
+    private createWallet2;
 }
