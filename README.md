@@ -1,589 +1,107 @@
-# XDV Platform Wallet
+# xdv-universal-wallet
+XDV Universal Wallet
 
+Creates a 3ID protocol enabled Ed25519 or Web3 provider
 
-`npm i xdvplatform-wallet`
-
-### Features
-
-### crypto
-
-- Supports for JWT, DID, JWE, XmlDsig, CMS (X509)
-- Algorithms included: `secp256k1`, `secp256r1`, `ed25519`, `rsa` and upcoming `bls`
-- `Keystore`, `HD Key`, `DER`, `JWK` and `PEM` support out of the box
-- Support for output to `LD Crypto Suite` key pairs for `ecdsa` and `ed25519`
-- More features planned like `bls` and `schnorr` for multi sig scenarios
-
-#### API
-
-####  Wallet
-
-A wallet instance is always required to start working with Wallet API. You configure RxJS subjects to handle password management between UI subscriber and Wallet API.
-
-`Creating a wallet with createWallet`
-
+## Example
 
 ```typescript
-    const wallet = new Wallet();
-    this.wallet.onRequestPassphraseSubscriber.subscribe(async (i) => {
-      this.canUnlock = true;
-      this.loading = true;
-      if (i.type === 'wallet') {
-        this.passphraseSubject.subscribe((passphrase) =>
-          this.wallet.onRequestPassphraseWallet.next({ type: 'ui', passphrase })
-        );
-      } else {
-        this.canUnlock = false;
-        this.loading = false;
-      }
-    });
+    const did = await Wallet.create3IDEd25519({
+      passphrase: 'abcdef123456',
+    })
+    expect(did.id.length).to.be.above(0)
 
-    let { id } = await wallet.createWallet(this.password, null, mnemonic);
-```
+    const ipfsManager = new IPFSManager(did.did)
+    await ipfsManager.start()
 
-`Unlocking using open`
+    const fil = Buffer.from('fffffffffffffffffffffff')
+    // auth
+    await did.did.authenticate()
+    const cid = await ipfsManager.addSignedObject(fil, {
+      name: 'UnitTest.txt',
+      contentType: 'text/text',
+      lastModified: new Date(),
+    })
+    expect(cid.length).to.be.above(0)
 
-Now with that id, be sure to save it somewhere, you always query the Wallet API DB to open the wallet. It will ask you for your password if you configure the RxJS Subscribers as defined in the previous step.
-
-```typescript
- await this.wallet.open(id);
-```
-
-
-`Wallet.generateMnemonic`
-
-Creates a new mnemonic
-
-```typescript
-     const mnemonic = Wallet.generateMnemonic();
-     const selectedWallet = await Wallet.createHDWallet({ mnemonic, password: '123password' });
-```
-
-
-`deriveChild`
-
-Creates a new child HD Wallet
-
-```typescript
-      const child1 = wallet.deriveChild(1, `m/44'/60'/0'/0`);
-      const child2 = wallet.deriveChild(2, `m/44'/60'/0'/0`);
-      const child3 = wallet.deriveChild(3, `m/44'/60'/0'/0`);
-```
-
-`deriveFromPath`
-
-Creates a new child HD Wallet
-
-```typescript
-      const child1 = wallet.deriveFromPath(`m/44'/60'/0'/0/1`);
-      const child2 = wallet.deriveFromPath(`m/44'/60'/0'/0/2`);
-      const child3 = wallet.deriveFromPath(`m/44'/60'/0'/0/3`);
-```
-
-
-`getEd25519`
-
-Creates a new Ed25519 curve 
-
-```typescript
-    const kp = await wallet.getEd25519();
-```
-
-
-`getP256`
-
-Creates a new P256/secp256r1 curve 
-
-```typescript
-    const kp = await wallet.getP256();
-```
-
-
-`getES256k`
-
-Creates a new secp256k1 curve 
-
-```typescript
-    const kp = await wallet.getES256k();
-```
-
-
-`getRSA256Standalone`
-
-Creates a new RSA key pair. This key pair is not generated from HD Wallet seed. 
-
-```typescript
-    const kp = await wallet.getRSA256Standalone();
-```
-
-`getBlsMasterKey`
-
-Creates a new BLS key pair. Returns an object. 
-
-```typescript
-    const kp = wallet.getBlsMasterKey();
-    const deriveValidatorKey1 = await kp.deriveValidatorKeys(1);
-```
-####  KeyConvert
-
-Handles key pair convertion from / to `PEM`, `DER` or `JWK`. Some algorithm also returns `JSON-LD` compatible exports.
-
-`KeyConvert.getX509RSA`
-
-Converts a RSA key pair. Available exports: JWK, PEM and LD.
-
-
-```typescript
-  const key = await Wallet.getRSA256Standalone();
-        const issuer: X509Info = {
-          stateOrProvinceName: 'PA',
-          organizationName: 'RM',
-          organizationalUnitName: 'Engineering',
-          commonName: 'Rogelio Morrell',
-          countryName: 'Panama',
-          localityName: 'Panama'
-        };
-        const { jwk, pem } = await KeyConvert.getX509RSA(key);
-        const jwt = await JWTService.sign(pem, {
-          testing: 'testing'
-        }, {
-          iat: (new Date(2020, 10, 10)).getTime(),
-          iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-          sub: 'document',
-          aud: 'receptor',
-          nbf: (new Date(2020, 10, 10)).getTime(),
-        });
+    const res = await ipfsManager.getObject(cid)
+    expect(res.value.name).equal('UnitTest.txt')
 
 ```
 
-`KeyConvert.getP256`
+## API
 
-Converts a P256 key pair. Available exports: JWK, DER, PEM and LD.
+### crypto/Wallet
 
 
-```typescript
+#### static async createES256K(options: any)
+  
+Creates an ES256K universal wallet
 
-    const mnemonic = Wallet.generateMnemonic();
-    const opts = { mnemonic, password: '123password' };
-    const keystore = await Wallet.createHDWallet(opts);
-    expect(JSON.parse(keystore).version).equal(3);
+Parameters
 
-    const wallet = await Wallet.unlock(keystore, opts.password);
-    const key = wallet.getP256();
+* `passphrase`: Passphrase
+* `walletid`: A wallet id, set it to load a previously created wallet, otherwise leave empty
+* `rpcUrl`: An EVM Compatible chain (Ethereum, Binance Smart Chain, etc)
+* `registry`: Contract address for EVM compatible ethr-did registry
 
-    const pem = (await KeyConvert.getP256(key)).pem;
-    const jwt = await JWTService.sign(pem, {
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
+Returns a `XDVUniversalProvider`
 
+* `did`: A DID object from 3ID library. Allows to authenticate and sign with IPLD
+* `secureMesssage`: Uses `EthCrypto` for encrypting and decrypting
+* `publicKey`: A public key as an array like
+* `issuer`: A DID object for issue signers
+* `web3`: Web3 instance used by DApps
+* `id`: A wallet id
+* `address`: Wallet address
 
-```
+#### static async create3IDEd25519(options: any)
+  
+Creates an Ed25519 universal wallet
 
-`KeyConvert.getES256K`
+>Note: Signing only, support for X25519 will be added later
 
-Converts a ES256K key pair. Available exports: JWK, DER, PEM and LD.
+Creates an universal wallet for ES256K
 
+Parameters
 
-```typescript
-    const wallet = await Wallet.unlock(keystore, opts.password);
-    const pem = (await KeyConvert.getES256K(wallet.getES256K())).pem;
-```
+* `passphrase`: Passphrase
+* `walletid`: A wallet id, set it to load a previously created wallet, otherwise leave empty
 
+Returns a `XDVUniversalProvider`
 
-`KeyConvert.getRSA`
+* `did`: A DID object from 3ID library. Allows to authenticate and sign with IPLD
+* `secureMesssage`: Uses `EthCrypto` for encrypting and decrypting
+* `publicKey`: A public key as an array like
+* `issuer`: A DID object for issue signers
+* `web3`: Web3 instance used by DApps
+* `id`: A wallet id
+* `address`: Wallet address
 
-Converts a RSA key pair. Available exports: JWK and PEM as pemAsPrivate and pemAsPublic.
 
+#### static async createWeb3Provider(options: any)
+  
+Creates a Web3 provider universal wallet
 
-```typescript
-   const key = await Wallet.getRSA256Standalone();
-    const pem = (await KeyConvert.getRSA(key)).pemAsPrivate;
-```
+Parameters
 
-`KeyConvert.getEd25519`
+* `passphrase`: Passphrase
+* `walletid`: A wallet id, set it to load a previously created wallet, otherwise leave empty
+* `rpcUrl`: An EVM Compatible chain (Ethereum, Binance Smart Chain, etc)
+* `registry`: Contract address for EVM compatible ethr-did registry
 
-Converts a Ed25519 key pair. Available exports: DER and PEM.
+### 3id/DIDManager
 
+### 3id/DriveManager
 
-```typescript
-    const mnemonic = Wallet.generateMnemonic();
-    const opts = { mnemonic, password: '123password' };
-    const keystore = await Wallet.createHDWallet(opts);
+### 3id/IPFSManager
 
-    const wallet = await Wallet.unlock(keystore, opts.password);
-    const key = wallet.getEd25519();
+### 3id/W3CVerifiedCredential
 
-    const pem = (await KeyConvert.getEd25519(key)).pem;
-    const jwt = await JWTService.sign(pem, {
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
 
-```
+#### issueCredential(did: DID, issuer: any, holderInfo: any)
+  
+Issues a Verified Credential
 
-`KeyConvert.createLinkedDataJsonFormat`
-
-Creates a Linked Data suite json format from a LD Suite export.
-
-```typescript
-    const mnemonic = Wallet.generateMnemonic();
-    const opts = { mnemonic, password: '123password' };
-    const keystore = await Wallet.createHDWallet(opts);
-
-    const wallet = await Wallet.unlock(keystore, opts.password);
-
-    const kp = wallet.getP256();
-    const kpJwk = await KeyConvert.getP256(kp);
-
-    // Create LD Crypto Suite - p256 / Sepc256r1
-    const ldCrypto = await KeyConvert
-        .createLinkedDataJsonFormat(LDCryptoTypes.Sepc256r1, kpJwk.ldSuite);
-
-    // Create IPFS key storage lock
-    const session = await xdvMethod.createIpldSession(kpJwk.pem);
-
-    // Create DID document with an did-ipid based issuer
-    const did = await DIDDocumentBuilder
-        .createDID({
-        issuer: session.key,
-        verificationKeys: [ldCrypto.toPublicKey()],
-        authenticationKeys: [ldCrypto.toAuthorizationKey()]
-        });
-
-    // Signing
-    const signed = await  JWTService.sign(kpJwk.pem, {
-        ...did,
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
-    
-```
-
-####  JWTService
-
-Signs and verifies JWT.
-
-`JWTService.decodeWithSignature`
-
-Decodes a JWT
-
-
-```typescript
-    // Sign as JWT
-    let signed = await JWTService.sign(kpJwk.pem, {
-        ...did,
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
-
-    // Decoded
-    const decoded = await JWTService.decodeWithSignature(signed);
-    expect(!!decoded.signature).equal(true)
-    expect(!!decoded.data).equal(true)
-    expect(!!decoded.header).equal(true)
-    expect(!!decoded.payload).equal(true)
-```
-
-`JWTService.sign`
-
-Signs a JWT
-
-
-```typescript
-    // Unlock wallet
-    const wallet = await Wallet.unlock(keystore, opts.password);
-
-    // Create key
-    const kp = wallet.getP256();
-    const kpJwk = await KeyConvert.getP256(kp);
-
-    // Create LD Crypto Suite - p256 / Sepc256r1
-    const ldCrypto = await KeyConvert
-        .createLinkedDataJsonFormat(LDCryptoTypes.Sepc256r1, kpJwk.ldSuite);
-
-    // Create DID id from PEM keypair and store it variable  
-    const session = await xdvMethod.createIpldSession(kpJwk.pem);
-
-    // Set DID
-    localStorage['recentlyStoreDID'] = session.key;
-
-    // Create DID document with an did-ipid based issuer
-    let did = await DIDDocumentBuilder
-        .createDID({
-        issuer: session.key,
-        verificationKeys: [ldCrypto.toPublicKey()],
-        authenticationKeys: [ldCrypto.toAuthorizationKey()]
-        });
-
-    // Sign as JWT
-    let signed = await JWTService.sign(kpJwk.pem, {
-        ...did,
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
-```
-
-`JWTService.verify`
-
-Verifies a JWT
-
-
-```typescript
-    // get document with a CID and DID
-    const resolver = await xdvMethod.getResolver(localStorage['recentlyStoreCID']);
-    const doc = await resolver.xdv(localStorage['recentlyStoreDID']);
-
-    // unlock wallet
-    let wallet = await Wallet.unlock(localStorage['ks'], localStorage['ps']);
-
-    // create new key pairs
-    const kp = wallet.getP256();
-    const kpJwk = await KeyConvert.getP256(kp);
-
-
-    // decrypt
-    const obj = await JOSEService.decrypt(kpJwk.jwk, doc.encrypted);
-    const verified = await JWTService.verify(kpJwk.pem,(<Buffer> obj.plaintext).toString('utf8'), 'receptor');
-```
-
-
-####  JOSEService
-
-Encrypts and decrypts JWT.
-
-`JOSEService.encrypt`
-
-Encrypts a string or buffer payload
-
-
-```typescript
-    // Unlock wallet
-    const wallet = await Wallet.unlock(keystore, opts.password);
-
-    // Create key
-    const kp = wallet.getP256();
-    const kpJwk = await KeyConvert.getP256(kp);
-
-    // Create LD Crypto Suite - p256 / Sepc256r1
-    const ldCrypto = await KeyConvert
-        .createLinkedDataJsonFormat(LDCryptoTypes.Sepc256r1, kpJwk.ldSuite);
-
-    // Create DID id from PEM keypair and store it variable  
-    const session = await xdvMethod.createIpldSession(kpJwk.pem);
-
-    // Set DID
-    localStorage['recentlyStoreDID'] = session.key;
-
-    // Create DID document with an did-ipid based issuer
-    let did = await DIDDocumentBuilder
-        .createDID({
-        issuer: session.key,
-        verificationKeys: [ldCrypto.toPublicKey()],
-        authenticationKeys: [ldCrypto.toAuthorizationKey()]
-        });
-
-    // Sign as JWT
-    let signed = await JWTService.sign(kpJwk.pem, {
-        ...did,
-        testing: 'testing'
-    }, {
-        iat: (new Date(2020, 10, 10)).getTime(),
-        iss: '0x4198258023eD0D6fae5DBCF3Af2aeDaaA363571F',
-        sub: 'document',
-        aud: 'receptor',
-        nbf: (new Date(2020, 10, 10)).getTime(),
-    });
-
-    // Encrypt JWT
-    const encrypted = await JOSEService.encrypt(kpJwk.jwk, signed);
-```
-
-`JOSEService.decrypt`
-
-Decrypts a cipher
-
-
-```typescript
-    // get document with a CID and DID
-    const resolver = await xdvMethod.getResolver(localStorage['recentlyStoreCID']);
-    const doc = await resolver.xdv(localStorage['recentlyStoreDID']);
-
-    // unlock wallet
-    let wallet = await Wallet.unlock(localStorage['ks'], localStorage['ps']);
-
-    // create new key pairs
-    const kp = wallet.getP256();
-    const kpJwk = await KeyConvert.getP256(kp);
-
-
-    // decrypt
-    const obj = await JOSEService.decrypt(kpJwk.jwk, doc.encrypted);
-    const verified = await JWTService.verify(kpJwk.pem,(<Buffer> obj.plaintext).toString('utf8'), 'receptor');
-
-
-```
-
-
-####  X509
-
-`X509.createSelfSignedCertificateFromRSA`
-
-
-Creates a self sign certificate from a RSA key pair
-
-```typescript
-    const issuer: X509Info = {
-        stateOrProvinceName: 'PA',
-        organizationName: 'RM',
-        organizationalUnitName: 'Engineering',
-        commonName: 'Rogelio Morrell',
-        countryName: 'Panama',
-        localityName: 'Panama'
-    };
-    const rsaKey = await Wallet.getRSA256Standalone();
-
-    const rsaKeyExports = await KeyConvert.getX509RSA(rsaKey);
-    const selfSignedCert = X509.createSelfSignedCertificateFromRSA(
-      rsaKeyExports.pemAsPrivate, rsaKeyExports.pemAsPublic, issuer);
-    const signedDocuments = await XmlDsig.signFEDocument(rsaKeyExports.pem, selfSignedCert, latestFEDocument);
-```
-
-
-####  XmlDsig (FE specific)
-
-Signs FE XML Documents
-
-`XmlDsig.signFEDocument`
-
-Signs a Factura Electronica de Panama document
-
-```typescript
-    const issuer: X509Info = {
-        stateOrProvinceName: 'PA',
-        organizationName: 'RM',
-        organizationalUnitName: 'Engineering',
-        commonName: 'Rogelio Morrell',
-        countryName: 'Panama',
-        localityName: 'Panama'
-    };
-    const rsaKey = await Wallet.getRSA256Standalone();
-
-    const rsaKeyExports = await KeyConvert.getX509RSA(rsaKey);
-    const selfSignedCert = X509.createSelfSignedCertificateFromRSA(
-      rsaKeyExports.pemAsPrivate, rsaKeyExports.pemAsPublic, issuer);
-    const signedDocuments = await XmlDsig.signFEDocument(rsaKeyExports.pemAsPrivate, selfSignedCert, latestFEDocument);
-```
-
-####  CMSSigner
-
-Signs CMS Documents
-
-`CMSSigner.sign`
-
-Signs a CMS document
-
-```typescript
-    const issuer: X509Info = {
-        stateOrProvinceName: 'PA',
-        organizationName: 'RM',
-        organizationalUnitName: 'Engineering',
-        commonName: 'Rogelio Morrell',
-        countryName: 'Panama',
-        localityName: 'Panama'
-    };
-    const rsaKey = await Wallet.getRSA256Standalone();
-
-    const rsaKeyExports = await KeyConvert.getX509RSA(rsaKey);
-    const selfSignedCert = X509.createSelfSignedCertificateFromRSA(
-      rsaKeyExports.pemAsPrivate, rsaKeyExports.pemAsPublic, issuer);
-    const res = CMSSigner.sign(selfSignedCert,
-        rsaKeyExports.pemAsPrivate,
-        fs.readFileSync(__dirname + '/fixtures/cms.pdf'));
-```
-
-#### `did`
-
-- Supports for basic DID JSON schemas
-- `DID JWT` signing and validation using `xdvplatform-tools/crypto` API
-- Includes `did-method-xdv` with resolver
-
-#### API
-
- 
-
-`Wallet.createHDWallet`
-
-Creates a new random HD Wallet
-
-```typescript
-  const keystore = await Wallet.createHDWallet({ password: 'password123' });
-```
-
-
-
-#### `fe`
-
-- Includes most of the API specifications for `Factura Electronica DGI Panama` up to September 2018 specification
-- Planned features: `CUFE` generation and `QR` generation
-
-
-
-#### `dv`
-
-- Digito Verificador for RUC Natural Person based on algorithm from Registro Publico de Panama. 
-- Client that calls a read only function in a Solidity smart contract
-
-##### Usage
-
-```typescript
-        const nodeUrl = '...node url';
-        const isMainnet = true;
-        const account = '...your ethereum accpunt';
-
-        const dv = new DV(account, nodeUrl, isMainnet);
-        
-        // initialize contracts
-        await dv.initialize();
-        
-        // call calculate
-        // input is 
-        // { type, segments 1 to  4}
-        // For more information, visit https://dv.auth2factor.com
-        const resp = await dv.calculate(CedulaInputTypes.N,
-            [0, 8],
-            [0, 0],
-            [7, 1, 3],
-            [2, 2, 3]);
-
-        expect(resp).equals('11');
-```
-
-@molekilla, Rogelio Morrell C. 
-Copyright 2020
-
-##### MIT License
+Parameters
+* @param options { passphrase, walletid, rpcUrl }

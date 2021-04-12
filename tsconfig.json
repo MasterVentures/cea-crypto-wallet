@@ -1,19 +1,34 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2016",
-    "moduleResolution": "node",
-    "sourceMap": false,
-    "outDir": "dist",
-    "removeComments": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "preserveConstEnums": true,
-    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "./lib",
+    "module": "CommonJS",
+    "target": "ES2017",
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
     "declaration": true,
+    "strict": false,
+    "sourceMap": true,
+    "rootDir": "./src",
     "skipLibCheck": true
   },
-  "include": ["./src"],
-  "exclude": ["node_modules", "examples", "tests", "dist", "./src/**/*_spec.ts"]
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "docs"
+  },
+   "include": [
+    "src", "types",
+    "./node_modules/handlebars",
+    "./node_modules/.bin"
+  ],
+  "exclude": [
+    "./node_modules", "./src/**/*_spec.ts",
+      "node_modules",
+      "./node_modules",
+      "./node_modules/*",
+      "./node_modules/@types/node/index.d.ts",
+  ]
 }

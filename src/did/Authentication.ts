@@ -1,4 +1,7 @@
+import { IsDefined } from 'class-validator';
 export class Authentication {
-	type: string;
-	publicKey: string;
+    @IsDefined()
+    type: string;
+    @IsDefined()
+    publicKey: string;
 }
